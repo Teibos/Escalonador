@@ -10,6 +10,9 @@ public class FachadaEscalonador {
 	private ArrayList<String> listaProcesso;
 	private String rodando;
 	private ArrayList<String> processoBloqueado;
+	private String execultando;
+	private ArrayList<String> temp;
+
 	
 
 	public FachadaEscalonador(TipoEscalonador tipoEscalonador) {
@@ -19,7 +22,7 @@ public class FachadaEscalonador {
 		this.tipoEscalonador = tipoEscalonador;
 		this.listaProcesso = new ArrayList<String>();
 		this.processoBloqueado = new ArrayList<String>();
-		
+		this.temp = new ArrayList<String>();
 				
 		
 	}
@@ -29,15 +32,22 @@ public class FachadaEscalonador {
 
 	public String getStatus() {
 		
-		if(this.listaProcesso.size() == 0) {
+		if((this.listaProcesso.size() != 0) && (this.tick == 0)) {
 			return ("Escalonador " + this.tipoEscalonador + ";"
-					+ "Processos: {"+this.rodando+"};"
+					+ "Processos: {"+ this.rodando +"Fila: "+ this.listaProcesso.toString()+"};"
 					+ "Quantum: " + this.quantum + ";"
 					+ "Tick: " + this.tick);
-		}
-		else {
+			
+		}else if ((this.listaProcesso.size() > 1) && (this.tick > 0)){
 			return ("Escalonador " + this.tipoEscalonador + ";"
-					+ "Processos: {Fila: "+ this.listaProcesso.toString()+"};"
+					+ "Processos: {"+ this.rodando +", Fila: "+"["+ this.listaProcesso.get(1) +"]"+"};"
+					+ "Quantum: " + this.quantum + ";"
+					+ "Tick: " + this.tick);
+			
+			
+		}else {
+			return ("Escalonador " + this.tipoEscalonador + ";"
+					+ "Processos: {"+this.rodando+"};"
 					+ "Quantum: " + this.quantum + ";"
 					+ "Tick: " + this.tick);
 		}
@@ -50,8 +60,27 @@ public class FachadaEscalonador {
 		this.tick ++;
 		if(this.listaProcesso.size() != 0) {
 			this.rodando = "Rodando: "+this.listaProcesso.get(0);
-			this.listaProcesso.remove(0);
+			this.execultando = this.listaProcesso.get(0);
+		}else {
+			this.rodando = "";
+		}if(this.listaProcesso.size() != 0) {
+			if ((this.tick > this.quantum)&&(this.tick <= this.quantum*2)) {
+				this.listaProcesso.remove(0);
+				this.listaProcesso.add(execultando);
+				this.rodando = "Rodando: "+this.listaProcesso.get(0);
+				//this.temp = this.listaProcesso;
+				//this.temp.remove(0);
+				
+			}else if((this.tick > this.quantum*2)&&(this.tick <= this.quantum*3)) {
+				this.listaProcesso.remove(0);
+				this.listaProcesso.add(execultando);
+				this.rodando = "Rodando: "+this.listaProcesso.get(0);
+				//this.temp = this.listaProcesso;
+				//this.temp.remove(0);
+				
+			}
 		}
+		
 		
 	}
 
@@ -61,17 +90,10 @@ public class FachadaEscalonador {
 	}
 
 	public void finalizarProcesso(String nomeProcesso) {
-		boolean gato = true;
 		
-		for(String x: this.listaProcesso) {
-			if(x == nomeProcesso) {
-				gato = false;
-				this.listaProcesso.remove(x);
-			}
-		}if(gato) {
-			this.rodando = "Rodando: ";
-		}
-		
+		this.listaProcesso.remove(0);
+		//this.listaProcesso.remove(0);
+			
 	}
 
 	public void bloquearProcesso(String nomeProcesso) {
