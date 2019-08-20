@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class FachadaEscalonador {
 	
+
 	private int quantum;
 	private int tick;
 	private TipoEscalonador tipoEscalonador;
@@ -13,7 +14,7 @@ public class FachadaEscalonador {
 	private String execultando;
 	private ArrayList<String> temp;
 
-	
+
 
 	public FachadaEscalonador(TipoEscalonador tipoEscalonador) {
 		this.quantum = 3;
@@ -31,6 +32,7 @@ public class FachadaEscalonador {
 	}
 
 	public String getStatus() {
+
 		
 		if((this.listaProcesso.size() != 0) && (this.tick == 0)) {
 			return ("Escalonador " + this.tipoEscalonador + ";"
@@ -82,11 +84,15 @@ public class FachadaEscalonador {
 		}
 		
 		
+
 	}
 
 	public void adicionarProcesso(String nomeProcesso) {
 		this.listaProcesso.add(nomeProcesso);
 		
+	}
+
+	public void adicionarProcesso(String nomeProcesso, int prioridade) {
 	}
 
 	public void finalizarProcesso(String nomeProcesso) {
