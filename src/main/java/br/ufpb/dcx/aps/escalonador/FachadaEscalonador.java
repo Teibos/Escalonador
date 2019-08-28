@@ -34,7 +34,10 @@ public class FachadaEscalonador {
 		this.processoBloqueado = new LinkedList<String>();
 		//this.tempTicks = new LinkedList<Integer>();
 		this.aRetomar = new ArrayList<String>();
-		this.gato = 0;		
+		this.gato = 0;
+		if(tipoEscalonador == null) {
+			throw new EscalonadorException();
+		}
 		
 	}
 
@@ -48,6 +51,11 @@ public class FachadaEscalonador {
 		//this.tempTicks = new LinkedList<Integer>();
 		this.aRetomar = new ArrayList<String>();
 		this.gato = 0;
+		if(quantum <= 0) {
+			throw new EscalonadorException();
+		}if(roundrobin == null) {
+			throw new EscalonadorException();
+		}
 	}
 
 	public String getStatus() {
@@ -150,25 +158,62 @@ public class FachadaEscalonador {
 	}
 
 	public void adicionarProcesso(String nomeProcesso) {
-		this.listaProcesso.add(nomeProcesso);
-		if(this.tick != 0);
-			this.gato = this.tick + 1;
+		if(this.listaProcesso.contains(nomeProcesso) || this.rodando == nomeProcesso) {
+			throw new EscalonadorException();
+		}else {
+			this.listaProcesso.add(nomeProcesso);
+			if(this.tick != 0);
+				this.gato = this.tick + 1;
+		}
+		
+		
 		
 	}
 
 	public void adicionarProcesso(String nomeProcesso, int prioridade) {
+		if(tipoEscalonador.equals(escalonadorRoundRobin())) {
+			throw new EscalonadorException();
+		}
 	}
 
 	public void finalizarProcesso(String nomeProcesso) {
-		this.aFinalizar = nomeProcesso;
+		if(this.rodando == nomeProcesso || this.listaProcesso.contains(nomeProcesso)) {
+			this.aFinalizar = nomeProcesso;
+		}else {
+			throw new EscalonadorException();
+		}
+		
 			
 	}
 
 	public void bloquearProcesso(String nomeProcesso) {
-		this.aBloquear = nomeProcesso;
+		if(this.rodando != nomeProcesso) {
+			throw new EscalonadorException();
+		}else if(this.rodando == nomeProcesso) {
+			this.aBloquear = nomeProcesso;
+		}else {
+			throw new EscalonadorException();
+		}
+		
 	}
 
 	public void retomarProcesso(String nomeProcesso) {
-		this.aRetomar.add(nomeProcesso);
+		//this.aRetomar.add(nomeProcesso);
+		/*
+		if (this.aRetomar.contains(nomeProcesso)) {
+			throw new EscalonadorException();
+		}else {
+			this.aRetomar.add(nomeProcesso);
+			
+		}*/
+		if(this.processoBloqueado.contains(nomeProcesso)) {
+			this.aRetomar.add(nomeProcesso);
+		}else {
+			throw new EscalonadorException();
+		}
+		
+	}
+	public TipoEscalonador escalonadorRoundRobin() {
+		return TipoEscalonador.RoundRobin;
 	}
 }
