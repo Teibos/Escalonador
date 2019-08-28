@@ -13,21 +13,23 @@ public class FachadaEscalonador {
 	private Queue<String> listaProcesso;
 	private String rodando;
 	private ArrayList<String> processoBloqueado;
-	private ArrayList<String> temp;
+	//private Queue<Integer> tempTicks;
 	private String aFinalizar;
+	private int controle;
+	
 	private int gato;
 
 
 
 	public FachadaEscalonador(TipoEscalonador tipoEscalonador) {
 		this.quantum = 3;
+		this.controle = 0;
 		this.tick = 0;
-		//this.rodando = "";
 		this.tipoEscalonador = tipoEscalonador;
 		this.listaProcesso = new LinkedList<String>();
 		this.processoBloqueado = new ArrayList<String>();
-		this.temp = new ArrayList<String>();
-				
+		//this.tempTicks = new LinkedList<Integer>();
+		this.gato = 0;		
 		
 	}
 
@@ -63,6 +65,7 @@ public class FachadaEscalonador {
 		if(this.rodando == null) {
 			if(this.listaProcesso.size() != 0) {
 				this.rodando = this.listaProcesso.poll();
+				this.controle = this.tick;
 			}
 		}
 		if (aFinalizar != null) {
@@ -71,16 +74,36 @@ public class FachadaEscalonador {
 			}else {
 				this.listaProcesso.remove(aFinalizar);
 			}
-		}if((this.gato + this.quantum) == this.tick ) {
-			this.listaProcesso.add(rodando);
-			this.rodando = this.listaProcesso.poll();
+			this.aFinalizar = null;
+			
+		//Para trocar de processos	
+			 
 		}
+		
+		if(this.listaProcesso.size() > 0) {
+			if(this.rodando != null) {
+				if(this.gato != 0) {
+					this.controle = gato;
+					this.gato = 0;
+				}
+				int temp = this.controle + this.quantum;
+				if(temp == this.tick) {
+					this.listaProcesso.add(this.rodando);
+					this.rodando = this.listaProcesso.poll();
+					this.controle = this.tick;
+					
+				}
+			}
+			
+		}
+		
 		
 	}
 
 	public void adicionarProcesso(String nomeProcesso) {
 		this.listaProcesso.add(nomeProcesso);
-		this.gato = this.tick;//fazer isso na lista
+		if(this.tick != 0);
+			this.gato = this.tick + 1;
 		
 	}
 
