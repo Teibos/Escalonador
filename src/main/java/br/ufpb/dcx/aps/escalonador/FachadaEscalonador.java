@@ -122,7 +122,8 @@ public class FachadaEscalonador {
 				this.listaProcesso.remove(aBloquear);
 				this.processoBloqueado.add(aBloquear);
 			}
-			this.aBloquear = null;	 
+			this.aBloquear = null;
+			
 		}if (this.aRetomar.size()>0) {
 			for(String k: this.aRetomar) {
 				this.listaProcesso.add(k);
@@ -162,8 +163,9 @@ public class FachadaEscalonador {
 			throw new EscalonadorException();
 		}else {
 			this.listaProcesso.add(nomeProcesso);
-			if(this.tick != 0);
+			if(this.tick != 0) {
 				this.gato = this.tick + 1;
+			}
 		}
 		
 		
@@ -171,8 +173,14 @@ public class FachadaEscalonador {
 	}
 
 	public void adicionarProcesso(String nomeProcesso, int prioridade) {
+		
 		if(tipoEscalonador.equals(escalonadorRoundRobin())) {
 			throw new EscalonadorException();
+		}else {
+			this.listaProcesso.add(nomeProcesso);
+			if(this.tick != 0) {
+				this.gato = this.tick + 1;
+			}
 		}
 	}
 
