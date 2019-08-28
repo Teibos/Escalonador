@@ -2,6 +2,7 @@ package br.ufpb.dcx.aps.escalonador;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class FachadaEscalonador {
@@ -12,10 +13,13 @@ public class FachadaEscalonador {
 	private TipoEscalonador tipoEscalonador;
 	private Queue<String> listaProcesso;
 	private String rodando;
-	private ArrayList<String> processoBloqueado;
+	private Queue<String> processoBloqueado;
 	//private Queue<Integer> tempTicks;
 	private String aFinalizar;
+	private String aBloquear;
 	private int controle;
+	private List<String> aRetomar;
+	
 	
 	private int gato;
 
@@ -27,13 +31,23 @@ public class FachadaEscalonador {
 		this.tick = 0;
 		this.tipoEscalonador = tipoEscalonador;
 		this.listaProcesso = new LinkedList<String>();
-		this.processoBloqueado = new ArrayList<String>();
+		this.processoBloqueado = new LinkedList<String>();
 		//this.tempTicks = new LinkedList<Integer>();
+		this.aRetomar = new ArrayList<String>();
 		this.gato = 0;		
 		
 	}
 
 	public FachadaEscalonador(TipoEscalonador roundrobin, int quantum) {
+		this.quantum = quantum;
+		this.controle = 0;
+		this.tick = 0;
+		this.tipoEscalonador = roundrobin;
+		this.listaProcesso = new LinkedList<String>();
+		this.processoBloqueado = new LinkedList<String>();
+		//this.tempTicks = new LinkedList<Integer>();
+		this.aRetomar = new ArrayList<String>();
+		this.gato = 0;
 	}
 
 	public String getStatus() {
@@ -52,7 +66,15 @@ public class FachadaEscalonador {
 				reslt += ", ";
 			}reslt += "Fila: "+ this.listaProcesso.toString();
 			
-		}reslt += "};Quantum: " + this.quantum + ";";
+		}if (processoBloqueado.size()>0) {
+			if (rodando != null) {
+				reslt += ", ";
+			}reslt += "Bloqueados: "+ this.processoBloqueado.toString();
+			
+		}
+		
+		
+		reslt += "};Quantum: " + this.quantum + ";";
 		
 		reslt += "Tick: " + this.tick;
 		
@@ -71,15 +93,42 @@ public class FachadaEscalonador {
 		if (aFinalizar != null) {
 			if(this.rodando == this.aFinalizar) {
 				this.rodando = null;
+				if(this.listaProcesso.size() != 0) {
+					this.rodando = this.listaProcesso.poll();
+					this.controle = this.tick;
+				}
 			}else {
 				this.listaProcesso.remove(aFinalizar);
 			}
-			this.aFinalizar = null;
+			this.aFinalizar = null;	
 			
-		//Para trocar de processos	
-			 
+		}if (aBloquear != null) {
+			if(this.rodando == this.aBloquear) {
+				this.rodando = null;
+				this.processoBloqueado.add(aBloquear);
+				if(this.listaProcesso.size() != 0) {
+					this.rodando = this.listaProcesso.poll();
+					this.controle = this.tick;
+				}
+			}else {
+				this.listaProcesso.remove(aBloquear);
+				this.processoBloqueado.add(aBloquear);
+			}
+			this.aBloquear = null;	 
+		}if (this.aRetomar.size()>0) {
+			for(String k: this.aRetomar) {
+				this.listaProcesso.add(k);
+				this.processoBloqueado.remove(k);
+			}
+			this.aRetomar.clear();
+			
+			
+			if(this.rodando == null) {
+				this.rodando = this.listaProcesso.poll();
+			}
 		}
 		
+		//Para trocar de processos
 		if(this.listaProcesso.size() > 0) {
 			if(this.rodando != null) {
 				if(this.gato != 0) {
@@ -116,9 +165,10 @@ public class FachadaEscalonador {
 	}
 
 	public void bloquearProcesso(String nomeProcesso) {
+		this.aBloquear = nomeProcesso;
 	}
 
 	public void retomarProcesso(String nomeProcesso) {
-		
+		this.aRetomar.add(nomeProcesso);
 	}
 }
