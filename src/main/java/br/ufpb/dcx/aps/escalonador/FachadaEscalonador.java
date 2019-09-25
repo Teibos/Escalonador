@@ -18,8 +18,12 @@ public class FachadaEscalonador {
 	private String aBloquear;
 	private int controle;
 	private List<String> aRetomar;
-
+	private List<Integer> tempDuracao;
+	private List<Integer> prioridadesInteiros;
 	private int gato;
+	 
+
+	
 
 	public FachadaEscalonador(TipoEscalonador tipoEscalonador) {
 		this.quantum = 3;
@@ -33,7 +37,13 @@ public class FachadaEscalonador {
 		this.gato = 0;
 		if (tipoEscalonador == null) {
 			throw new EscalonadorException();
+		}if ( tipoEscalonador.equals(tipoEscalonador.MaisCurtoPrimeiro)) {
+			this.quantum = 0;
+		}if ( tipoEscalonador.equals(tipoEscalonador.Prioridade)) {
+			this.prioridadesInteiros = new ArrayList<Integer>();
+			this.tempDuracao = new ArrayList<Integer>();
 		}
+		
 
 	}
 
@@ -122,22 +132,28 @@ public class FachadaEscalonador {
 			} else {
 				this.listaProcesso.remove(aBloquear);
 				this.processoBloqueado.add(aBloquear);
+				
 			}
 			this.aBloquear = null;
 
 		}
 		if (this.aRetomar.size() > 0) {
+			
 			for (String k : this.aRetomar) {
-				this.listaProcesso.add(k);
+				
+				if (this.rodando == null) {
+					this.rodando = k;
+					this.controle = this.tick;
+				}else {
+					this.listaProcesso.add(k);
+					
+				}
 				this.processoBloqueado.remove(k);
 			}
 			this.aRetomar.clear();
 
-			if (this.rodando == null) {
-				this.rodando = this.listaProcesso.poll();
-			}
-		}
 
+		}
 		// Para trocar de processos
 		if (this.listaProcesso.size() > 0) {
 			if (this.rodando != null) {
@@ -150,18 +166,19 @@ public class FachadaEscalonador {
 					this.listaProcesso.add(this.rodando);
 					this.rodando = this.listaProcesso.poll();
 					this.controle = this.tick;
-
-				}
-			}
-
-		}
-
+					}}}
+		
+		//Parte de Prioridade
+		
+		
 	}
 
 	public void adicionarProcesso(String nomeProcesso) {
 		if (this.listaProcesso.contains(nomeProcesso) || this.rodando == nomeProcesso) {
 			throw new EscalonadorException();
-		} else {
+		}else if(tipoEscalonador.equals(tipoEscalonador.Prioridade)){
+			throw new EscalonadorException();
+		}else {
 			this.listaProcesso.add(nomeProcesso);
 			if (this.tick != 0) {
 				this.gato = this.tick + 1;
@@ -174,11 +191,22 @@ public class FachadaEscalonador {
 
 		if (tipoEscalonador.equals(escalonadorRoundRobin())) {
 			throw new EscalonadorException();
-		} else {
+		}else if (this.listaProcesso.contains(nomeProcesso) || this.rodando == nomeProcesso) {
+			throw new EscalonadorException();
+		} else if(prioridade > 4) {
+			throw new EscalonadorException();
+			
+		}else {
 			this.listaProcesso.add(nomeProcesso);
-			if (this.tick != 0) {
+			
+			
+			
+			/**
+			 if (this.tick != 0) {
 				this.gato = this.tick + 1;
-			}
+			} 
+			 */
+			
 		}
 	}
 
@@ -223,6 +251,7 @@ public class FachadaEscalonador {
 	}
 
 	public void adicionarProcessoTempoFixo(String string, int duracao) {
-
+		this.listaProcesso.add(string);
+		this.tempDuracao.add(duracao);
 	}
 }
