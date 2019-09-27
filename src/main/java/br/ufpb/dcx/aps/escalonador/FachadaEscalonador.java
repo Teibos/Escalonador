@@ -20,10 +20,11 @@ public class FachadaEscalonador {
 	private List<String> aRetomar;
 	private List<Integer> tempDuracao;
 	private List<Integer> prioridadesInteiros;
-	private int gato;
-	 
+	private List<String> listaEMCP;
+	private int tempRodandoMCP;
 
-	
+	private int gato;
+	private int outroGato;
 
 	public FachadaEscalonador(TipoEscalonador tipoEscalonador) {
 		this.quantum = 3;
@@ -35,15 +36,18 @@ public class FachadaEscalonador {
 		// this.tempTicks = new LinkedList<Integer>();
 		this.aRetomar = new ArrayList<String>();
 		this.gato = 0;
+		this.listaEMCP = new ArrayList<String>();
+		this.prioridadesInteiros = new ArrayList<Integer>();
 		if (tipoEscalonador == null) {
 			throw new EscalonadorException();
-		}if ( tipoEscalonador.equals(tipoEscalonador.MaisCurtoPrimeiro)) {
+		}
+		if (tipoEscalonador.equals(tipoEscalonador.MaisCurtoPrimeiro)) {
 			this.quantum = 0;
-		}if ( tipoEscalonador.equals(tipoEscalonador.Prioridade)) {
+		}
+		if (tipoEscalonador.equals(tipoEscalonador.Prioridade)) {
 			this.prioridadesInteiros = new ArrayList<Integer>();
 			this.tempDuracao = new ArrayList<Integer>();
 		}
-		
 
 	}
 
@@ -56,6 +60,8 @@ public class FachadaEscalonador {
 		this.processoBloqueado = new LinkedList<String>();
 		// this.tempTicks = new LinkedList<Integer>();
 		this.aRetomar = new ArrayList<String>();
+		this.listaEMCP = new ArrayList<String>();
+		this.prioridadesInteiros = new ArrayList<Integer>();
 		this.gato = 0;
 		if (quantum <= 0) {
 			throw new EscalonadorException();
@@ -132,26 +138,25 @@ public class FachadaEscalonador {
 			} else {
 				this.listaProcesso.remove(aBloquear);
 				this.processoBloqueado.add(aBloquear);
-				
+
 			}
 			this.aBloquear = null;
 
 		}
 		if (this.aRetomar.size() > 0) {
-			
+
 			for (String k : this.aRetomar) {
-				
+
 				if (this.rodando == null) {
 					this.rodando = k;
 					this.controle = this.tick;
-				}else {
+				} else {
 					this.listaProcesso.add(k);
-					
+
 				}
 				this.processoBloqueado.remove(k);
 			}
 			this.aRetomar.clear();
-
 
 		}
 		// Para trocar de processos
@@ -166,19 +171,54 @@ public class FachadaEscalonador {
 					this.listaProcesso.add(this.rodando);
 					this.rodando = this.listaProcesso.poll();
 					this.controle = this.tick;
-					}}}
+				}
+			}
+		}
+
+		// Parte de Prioridade
+		/**
+		 * if (this.tempDuracao != null) { for ( int t : this.prioridadesInteiros) {
+		 * 
+		 * } }
+		 **/
 		
-		//Parte de Prioridade
-		
-		
+
+		// Parte do mais Curto Primeiro
+		/*
+		if (this.tipoEscalonador.equals(tipoEscalonador.MaisCurtoPrimeiro)) {
+			if (this.listaEMCP.size() > 0) {
+				if (this.rodando == null) {
+					this.rodando = this.listaEMCP.remove(0);
+					this.tempRodandoMCP = this.prioridadesInteiros.remove(0);
+					this.outroGato = this.tick + this.tempRodandoMCP;
+				}
+
+			}
+			if (this.outroGato == this.tick && this.rodando != null) {
+				if (this.listaEMCP.size() > 0) {
+					this.rodando = this.listaEMCP.remove(0);
+					this.tempRodandoMCP = this.prioridadesInteiros.remove(0);
+				} else {
+					this.rodando = null;
+					this.tempRodandoMCP = 0;
+				}
+				if (this.tempRodandoMCP > 0) {
+					this.outroGato = this.tick + this.tempRodandoMCP;
+
+				}
+			}
+
+		}
+		*/
+
 	}
 
 	public void adicionarProcesso(String nomeProcesso) {
 		if (this.listaProcesso.contains(nomeProcesso) || this.rodando == nomeProcesso) {
 			throw new EscalonadorException();
-		}else if(tipoEscalonador.equals(tipoEscalonador.Prioridade)){
+		} else if (tipoEscalonador.equals(tipoEscalonador.Prioridade)) {
 			throw new EscalonadorException();
-		}else {
+		} else {
 			this.listaProcesso.add(nomeProcesso);
 			if (this.tick != 0) {
 				this.gato = this.tick + 1;
@@ -191,22 +231,18 @@ public class FachadaEscalonador {
 
 		if (tipoEscalonador.equals(escalonadorRoundRobin())) {
 			throw new EscalonadorException();
-		}else if (this.listaProcesso.contains(nomeProcesso) || this.rodando == nomeProcesso) {
+		} else if (this.listaProcesso.contains(nomeProcesso) || this.rodando == nomeProcesso) {
 			throw new EscalonadorException();
-		} else if(prioridade > 4) {
+		} else if (prioridade > 4) {
 			throw new EscalonadorException();
-			
-		}else {
+
+		} else {
 			this.listaProcesso.add(nomeProcesso);
-			
-			
-			
+
 			/**
-			 if (this.tick != 0) {
-				this.gato = this.tick + 1;
-			} 
+			 * if (this.tick != 0) { this.gato = this.tick + 1; }
 			 */
-			
+
 		}
 	}
 
@@ -251,7 +287,44 @@ public class FachadaEscalonador {
 	}
 
 	public void adicionarProcessoTempoFixo(String string, int duracao) {
-		this.listaProcesso.add(string);
-		this.tempDuracao.add(duracao);
+		// this.listaProcesso.add(string);
+		// this.tempDuracao.add(duracao);
+		/*
+		if (this.listaEMCP.contains(string) || string == null) {
+			throw new EscalonadorException();
+
+		}
+		
+		if (duracao < 1) {
+			throw new EscalonadorException();
+		}
+		*/
+		
+		int maisCurto = Integer.MAX_VALUE;
+
+		if (this.listaEMCP.size() == 0) {
+			this.listaEMCP.add(string);
+			this.prioridadesInteiros.add(duracao);
+		} else {
+			int menorPosicao = 0;
+			this.listaEMCP.add(string);
+			this.prioridadesInteiros.add(duracao);
+			for (int i = 0; i < this.prioridadesInteiros.size(); i++) {
+				if (this.prioridadesInteiros.get(i) < maisCurto) {
+					maisCurto = this.prioridadesInteiros.get(i);
+					menorPosicao = i;
+				}
+			}if (menorPosicao > 0) {
+				String processoMenor = this.listaEMCP.remove(menorPosicao);
+				int processoMenorTempo = this.prioridadesInteiros.remove(menorPosicao);
+				this.listaEMCP.add(0, processoMenor);
+				this.prioridadesInteiros.add(0, processoMenorTempo);
+				for (int k = 0; duracao < k; k++) {
+					this.listaEMCP.add(0, string);
+					this.prioridadesInteiros.add(0, duracao);
+				}
+			}
+		}
+		
 	}
 }
