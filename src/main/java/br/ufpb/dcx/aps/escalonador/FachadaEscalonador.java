@@ -225,7 +225,9 @@ public class FachadaEscalonador {
 			throw new EscalonadorException();
 		} else if (tipoEscalonador.equals(tipoEscalonador.Prioridade)) {
 			throw new EscalonadorException();
-		} else {
+		} else if(tipoEscalonador.equals(tipoEscalonador.MaisCurtoPrimeiro)){
+			throw new EscalonadorException();
+		}else {
 			this.listaProcesso.add(nomeProcesso);
 			if (this.tick != 0) {
 				this.gato = this.tick + 1;
@@ -240,7 +242,9 @@ public class FachadaEscalonador {
 			throw new EscalonadorException();
 		} else if (prioridade > 4) {
 			throw new EscalonadorException();
-		} else {
+		} else if(tipoEscalonador.equals(tipoEscalonador.MaisCurtoPrimeiro)){
+			throw new EscalonadorException();
+		}else {
 			this.listaProcesso.add(nomeProcesso);
 			/**
 			 * if (this.tick != 0) { this.gato = this.tick + 1; }
@@ -291,14 +295,13 @@ public class FachadaEscalonador {
 	public void adicionarProcessoTempoFixo(String string, int duracao) {
 		// this.listaProcesso.add(string);
 		// this.tempDuracao.add(duracao);
-		/*
-		 * if (this.listaEMCP.contains(string) || string == null) { throw new
-		 * EscalonadorException();
-		 * 
-		 * }
-		 * 
-		 * if (duracao < 1) { throw new EscalonadorException(); }
-		 */
+		
+		  if (this.listaEMCP.contains(string) || string == null) { throw new
+			  EscalonadorException();
+		  }if (duracao < 1) { 
+			  throw new EscalonadorException(); 
+		  }
+		 
 
 		int maisCurto = Integer.MAX_VALUE;
 
